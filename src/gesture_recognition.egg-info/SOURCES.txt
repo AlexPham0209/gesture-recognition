@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+src/__init__.py
+src/main.py
+src/gesture_recognition.egg-info/PKG-INFO
+src/gesture_recognition.egg-info/SOURCES.txt
+src/gesture_recognition.egg-info/dependency_links.txt
+src/gesture_recognition.egg-info/requires.txt
+src/gesture_recognition.egg-info/top_level.txt
