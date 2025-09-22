@@ -13,39 +13,62 @@ GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
 VisionRunningMode = mp.tasks.vision.RunningMode
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
-gestures = None
 
-def print_result(result, output_image, timestamp_ms):
-    global gestures
+current_gesture = None
+gesture = None
+
+def get_result(result, output_image, timestamp_ms):
+    global gesture, prev_gesture
 
     if len(result.gestures) != 0 and result.gestures[0][0].category_name != "None":
-        gestures = result.hand_landmarks
-        print(
-            "gesture recognition result: {}".format(result.gestures[0][0].category_name)
-        )
+        gesture = result
         
-
 def draw_hands(image):
-    global gestures
+    global gesture
 
-    for gesture in gestures:
+    for hand_landmarks in gesture.hand_landmarks:
         landmarks = landmark_pb2.NormalizedLandmarkList()
         landmarks.landmark.extend([
-            landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in gesture
+            landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in hand_landmarks
         ])
 
         mp_drawing.draw_landmarks(
             frame, landmarks, mp_hands.HAND_CONNECTIONS
         )
+    
+    gesture = None
 
-    gestures = None
+def process_gesture(gesture_type):
+    match gesture_type:
+        case "Closed_Fist":
+            print("Closed")
 
+        case "Open_Palm":
+            print("Open")
+
+        case "Pointing_Up":
+            print("Up")
+
+        case "Thumb_Down":
+            print("Down")
+
+        case "Thumb_Up":
+            print("Up")
+
+        case "Victory":
+            print("Victory")
+
+        case "ILoveYou":
+            print("I LOVE U")
+        
+        case _:
+            print("WOWIEE")
 
 # Create a gesture recognizer instance with the video mode:
 options = GestureRecognizerOptions(
     base_options=BaseOptions(model_asset_path=MODEL_PATH),
     running_mode=VisionRunningMode.LIVE_STREAM,
-    result_callback=print_result,
+    result_callback=get_result,
 )
 
 recognizer = GestureRecognizer.create_from_options(options)
@@ -54,16 +77,20 @@ stamp = 0
 
 while True:
     ret, frame = cap.read()
-    # frame = cv2.resize(frame, (400, 400))
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
     recognition_result = recognizer.recognize_async(mp_image, stamp)
-    
-    if gestures:
-        draw_hands(frame)
+
+    if gesture:
+        gesture_type = gesture.gestures[0][0].category_name
+        if gesture_type != current_gesture or not current_gesture:
+            process_gesture(gesture_type)
         
+        current_gesture = gesture.gestures[0][0].category_name
+        draw_hands(frame)
+    
     cv2.imshow("camera", frame)
     stamp += 1
-
+    
     if cv2.waitKey(1) == ord("q"):
         break
 
