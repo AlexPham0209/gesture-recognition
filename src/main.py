@@ -25,18 +25,20 @@ def print_result(result, output_image, timestamp_ms):
         )
         
 
-def draw_hands(gestures, image):
+def draw_hands(image):
+    global gestures
+
     for gesture in gestures:
         landmarks = landmark_pb2.NormalizedLandmarkList()
         landmarks.landmark.extend([
             landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in gesture
         ])
-        
+
         mp_drawing.draw_landmarks(
             frame, landmarks, mp_hands.HAND_CONNECTIONS
         )
 
-    gesture = None
+    gestures = None
 
 
 # Create a gesture recognizer instance with the video mode:
@@ -57,7 +59,7 @@ while True:
     recognition_result = recognizer.recognize_async(mp_image, stamp)
     
     if gestures:
-        draw_hands(gestures, frame)
+        draw_hands(frame)
         
     cv2.imshow("camera", frame)
     stamp += 1
