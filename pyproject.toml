@@ -8,8 +8,8 @@ version = "1.0"
 description = "Gesture recognition demo"
 readme = "README.md"
 requires-python = ">=3.12"
-
 dependencies = [
   "mediapipe",
-  "opencv-python"
+  "opencv-python",
+  "ruff"
 ]
