@@ -1,11 +1,11 @@
 import mediapipe as mp
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
+from playsound3 import playsound
 from mediapipe.framework.formats import landmark_pb2
 import cv2
 import os
 
 MODEL_PATH = os.path.join("model", "gesture_recognizer.task")
+SOUND_PATH = "sounds"
 
 BaseOptions = mp.tasks.BaseOptions
 GestureRecognizer = mp.tasks.vision.GestureRecognizer
@@ -20,7 +20,7 @@ gesture = None
 
 def get_result(result, output_image, timestamp_ms):
     global gesture, prev_gesture
-
+    
     if len(result.gestures) != 0 and result.gestures[0][0].category_name != "None":
         gesture = result
 
@@ -47,12 +47,15 @@ def draw_hands(image):
 def process_gesture(gesture_type):
     match gesture_type:
         case "Closed_Fist":
+            playsound(os.path.join(SOUND_PATH, "game-start.mp3"), block=False)
             print("Closed")
 
         case "Open_Palm":
+            playsound(os.path.join(SOUND_PATH, "gun-shot.mp3"), block=False)
             print("Open")
 
         case "Pointing_Up":
+            playsound(os.path.join(SOUND_PATH, "yay.mp3"), block=False)
             print("Point Up")
 
         case "Thumb_Down":
@@ -68,7 +71,7 @@ def process_gesture(gesture_type):
             print("I LOVE U")
 
         case _:
-            print("WOWIEE")
+            print("BAD BAD BAD")
 
 
 # Create a gesture recognizer instance with the video mode:
@@ -97,7 +100,7 @@ while True:
 
         current_gesture = gesture.gestures[0][0].category_name
 
-
+        
         # Write the current gesture in the window and draw the hand connections
         cv2.putText(
             frame,
