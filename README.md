@@ -6,7 +6,7 @@
  2. Install your IDE/text editor of choice (I'm personally using VS Code)
  3. Use the following command (if you have [Git](https://git-scm.com/downloads)). Otherwise, download the ZIP.
 ```
-git clone 
+git clone https://github.com/AlexPham0209/gesture-recognition.git
 ```
 
  4. Open the command prompt and run the following commands to create and activate a virtual environment:
