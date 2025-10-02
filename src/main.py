@@ -25,8 +25,8 @@ def get_result(result, output_image, timestamp_ms):
         gesture = result
 
 
-def draw_hands(image):
-    global gesture
+def draw_hands(frame):
+    global gesture, current_gesture
 
     for hand_landmarks in gesture.hand_landmarks:
         landmarks = landmark_pb2.NormalizedLandmarkList()
@@ -74,52 +74,58 @@ def process_gesture(gesture_type):
             print("BAD BAD BAD")
 
 
-# Create a gesture recognizer instance with the video mode:
-options = GestureRecognizerOptions(
-    base_options=BaseOptions(model_asset_path=MODEL_PATH),
-    running_mode=VisionRunningMode.LIVE_STREAM,
-    result_callback=get_result,
-)
+def main():
+    global gesture, current_gesture
 
-recognizer = GestureRecognizer.create_from_options(options)
-cap = cv2.VideoCapture(0)
-stamp = 0
+    # Create a gesture recognizer instance with the video mode:
+    options = GestureRecognizerOptions(
+        base_options=BaseOptions(model_asset_path=MODEL_PATH),
+        running_mode=VisionRunningMode.LIVE_STREAM,
+        result_callback=get_result,
+    )
 
-# Repeatedly reading the webcam stream and processing the frame
-while True:
-    ret, frame = cap.read()
-    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
-    recognition_result = recognizer.recognize_async(mp_image, stamp)
+    recognizer = GestureRecognizer.create_from_options(options)
+    cap = cv2.VideoCapture(0)
+    stamp = 0
 
-    # If a gesture is detected, we process the gesture type and draw the hand
-    if gesture:
-        # If the gesture is different than the previous gesture, we run the process function
-        gesture_type = gesture.gestures[0][0].category_name
-        if gesture_type != current_gesture or not current_gesture:
-            process_gesture(gesture_type)
+    # Repeatedly reading the webcam stream and processing the frame
+    while True:
+        ret, frame = cap.read()
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
+        recognition_result = recognizer.recognize_async(mp_image, stamp)
 
-        current_gesture = gesture.gestures[0][0].category_name
+        # If a gesture is detected, we process the gesture type and draw the hand
+        if gesture:
+            # If the gesture is different than the previous gesture, we run the process function
+            gesture_type = gesture.gestures[0][0].category_name
+            if gesture_type != current_gesture or not current_gesture:
+                process_gesture(gesture_type)
 
-        
-        # Write the current gesture in the window and draw the hand connections
-        cv2.putText(
-            frame,
-            current_gesture,
-            (50, 50),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            (255, 0, 0),
-            4,
-            cv2.LINE_AA,
-        )
+            current_gesture = gesture.gestures[0][0].category_name
 
-        draw_hands(frame)
+            
+            # Write the current gesture in the window and draw the hand connections
+            cv2.putText(
+                frame,
+                current_gesture,
+                (50, 50),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (255, 0, 0),
+                4,
+                cv2.LINE_AA,
+            )
 
-    cv2.imshow("camera", frame)
-    stamp += 1
+            draw_hands(frame)
 
-    if cv2.waitKey(1) == ord("q"):
-        break
+        cv2.imshow("camera", frame)
+        stamp += 1
 
-cap.release()
-cv2.destroyAllWindows()
+        if cv2.waitKey(1) == ord("q"):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()

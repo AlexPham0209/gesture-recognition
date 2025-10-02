@@ -14,3 +14,6 @@ dependencies = [
   "ruff",
   "playsound3"
 ]
+
+[project.scripts]
+run_recognition = "main:main"
