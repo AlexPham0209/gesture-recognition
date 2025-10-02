@@ -4,7 +4,7 @@
  ## Setup 
  1. Install [Python 3.12](https://www.python.org/downloads/)
  2. Install your IDE/text editor of choice (I'm personally using VS Code)
- 3. Use the following command (if you have [Git])(https://git-scm.com/downloads)). Otherwise, download the ZIP.
+ 3. Use the following command (if you have [Git](https://git-scm.com/downloads)). Otherwise, download the ZIP.
 ```
 git clone 
 ```
